@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -20,59 +18,44 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping = false;
     private float jumpTimer;
 
-    
-
     private void Update()
     {
         isGround = Physics2D.OverlapCircle(feetPos.position, groundDisctance, groundLayer);
 
-        #region JUMPING
-
+        // JUMPING
         if (isGround && Input.GetButtonDown("Jump"))
         {
             isJumping = true;
             rb.linearVelocity = Vector2.up * jumpForce;
         }
 
-        if (isJumping && Input.GetButton("Jump")){
+        if (isJumping && Input.GetButton("Jump"))
+        {
             if (jumpTimer < jumpTime)
             {
                 rb.linearVelocity = Vector2.up * jumpForce;
-
                 jumpTimer += Time.deltaTime;
-            } else
-            {
-                isJumping = false;
             }
+            else isJumping = false;
         }
 
         if (Input.GetButtonUp("Jump"))
         {
             isJumping = false;
-            jumpTimer = 0;
+            jumpTimer = 0f;
         }
 
-        #endregion
-
-        #region CROUCHING
-
+        // CROUCHING
         if (isGround && Input.GetButton("Crouch"))
         {
             PlayerSquare.localScale = new Vector3(PlayerSquare.localScale.x, crouchHeight, PlayerSquare.localScale.z);
-
             if (isJumping)
-            {
                 PlayerSquare.localScale = new Vector3(PlayerSquare.localScale.x, 1f, PlayerSquare.localScale.z);
-            }
         }
 
         if (Input.GetButtonUp("Crouch"))
         {
             PlayerSquare.localScale = new Vector3(PlayerSquare.localScale.x, 1f, PlayerSquare.localScale.z);
         }
-
-        #endregion
-
     }
-
 }

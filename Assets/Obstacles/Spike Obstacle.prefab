@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6135342311132437751}
   - component: {fileID: 3729064299462100819}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Spike Obstacle
   m_TagString: Obstacle
   m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 4622316010646993315}
   - component: {fileID: 3403815627550638904}
   - component: {fileID: 2288088554043270608}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Spike
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -141,7 +141,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.735849, g: 0.32974365, b: 0.32974365, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

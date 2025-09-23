@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     int L_PL, L_PS, L_OL, L_OS;
+    int score = 0;
 
     void Awake()
     {
@@ -19,7 +20,8 @@ public class PlayerCollision : MonoBehaviour
         int me = gameObject.layer, ot = other.gameObject.layer;
         if ((me == L_PL && ot == L_OL) || (me == L_PS && ot == L_OS))
         {
-            Destroy(gameObject); // TODO: GM/HP
+            Destroy(gameObject); //Destroy obstacle
+            // TODO: GM/HP
         }
     }
 

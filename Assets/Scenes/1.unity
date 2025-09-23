@@ -679,7 +679,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.019605607, y: -0.054896384}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -689,7 +689,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.8039426, y: 0.89020723}
   m_EdgeRadius: 0
 --- !u!212 &993547873
 SpriteRenderer:
@@ -812,11 +812,14 @@ MonoBehaviour:
   obstaclePrefabs:
   - {fileID: 2317311499053294393, guid: 04099c4ef451d408abaa562ec900f1c7, type: 3}
   - {fileID: 4913700686604917134, guid: 4e2ea424c45f54c53b9039c1229fe312, type: 3}
-  - {fileID: 2308554302963438158, guid: 9e410abdbe68246fea0998013fee2f0f, type: 3}
+  - {fileID: 2299615551346551750, guid: 93525cf0513334fe9a02f3712a2c9332, type: 3}
   - {fileID: 2299615551346551750, guid: 629b89ee4c3e944479cbd6e59a5621d4, type: 3}
-  - {fileID: 2299615551346551750, guid: 629b89ee4c3e944479cbd6e59a5621d4, type: 3}
-  obstacleSpawnTime: 2
-  obstacleSpeed: 8
+  - {fileID: 5150673907284124203, guid: 6bf33579dad6746929a000a5a4f89f64, type: 3}
+  obstacleSpawnTime: 1.5
+  obstacleSpeed: 5
+  speeedIncreaseInterval: 5
+  speedIncrement: 1
+  enableSpeedIncrease: 1
 --- !u!4 &1966930287
 Transform:
   m_ObjectHideFlags: 0
@@ -826,7 +829,7 @@ Transform:
   m_GameObject: {fileID: 1966930285}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.86, y: -4, z: 0}
+  m_LocalPosition: {x: 7.93, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

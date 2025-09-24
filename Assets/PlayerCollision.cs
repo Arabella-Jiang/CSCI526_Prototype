@@ -18,7 +18,8 @@ public class PlayerCollision : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         int me = gameObject.layer, ot = other.gameObject.layer;
-        if ((me == L_PL && ot == L_OL) || (me == L_PS && ot == L_OS))
+        // Reversed logic: different colors cause death
+        if ((me == L_PL && ot == L_OS) || (me == L_PS && ot == L_OL))
         {
             Destroy(gameObject); //Destroy obstacle
             // TODO: GM/HP
@@ -31,11 +32,12 @@ public class PlayerCollision : MonoBehaviour
         int ot = c.collider.gameObject.layer;
 
         bool isObstacle = (ot == L_OL || ot == L_OS);
-        bool isMismatchedPair =
-            (me == L_PL && ot == L_OS) ||   
-            (me == L_PS && ot == L_OL);    
+        bool isMatchedPair =
+            (me == L_PL && ot == L_OL) ||   
+            (me == L_PS && ot == L_OS);    
 
-        if (isObstacle && isMismatchedPair)
+        // Reversed logic: same colors pass through
+        if (isObstacle && isMatchedPair)
         {
             foreach (var myCol in GetComponentsInChildren<Collider2D>())
                 Physics2D.IgnoreCollision(myCol, c.collider, true);

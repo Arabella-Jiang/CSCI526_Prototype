@@ -7,7 +7,6 @@ public class Spawner : MonoBehaviour
     [SerializeField] private GameObject[] obstaclePrefabs;
     public float obstacleSpawnTime = 2f;
     public float obstacleSpeed = 1f;
-    private float[] spawnHeights = new float[] { -4f, -3.1f };
 
     public float speeedIncreaseInterval = 10f;
     public float speedIncrement = 0.5f;
@@ -46,9 +45,9 @@ public class Spawner : MonoBehaviour
     private void Spawn()
     {
         GameObject prefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Length)];
-        float chosenY = IsType1(prefab) ? -4f : spawnHeights[Random.Range(0, spawnHeights.Length)];
-
-        Vector3 spawnPosition = new Vector3(transform.position.x, chosenY, 0f);
+        
+        // Spawn at Spawner's X position, keep prefab's original Y and Z positions
+        Vector3 spawnPosition = new Vector3(transform.position.x, prefab.transform.position.y, prefab.transform.position.z);
         GameObject spawned = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
         //Add active obstacle ob into list
@@ -56,19 +55,14 @@ public class Spawner : MonoBehaviour
 
         Physics2D.SyncTransforms();
 
-        var cols = spawned.GetComponentsInChildren<Collider2D>(true);
-        if (cols.Length > 0)
-        {
-            float bottom = float.MaxValue;
-            foreach (var c in cols) if (c.enabled) bottom = Mathf.Min(bottom, c.bounds.min.y);
-            if (bottom < float.MaxValue)
-                spawned.transform.position += new Vector3(0f, chosenY - bottom, 0f);
-        }
-
         PostSpawnFixups(spawned);
 
-        var rb = spawned.GetComponentInChildren<Rigidbody2D>();
-        if (rb) rb.linearVelocity = Vector2.left * obstacleSpeed; 
+        // Set velocity for all Rigidbody2D components to ensure all parts of composite obstacles move
+        var rbs = spawned.GetComponentsInChildren<Rigidbody2D>();
+        foreach (var rb in rbs)
+        {
+            if (rb) rb.linearVelocity = Vector2.left * obstacleSpeed;
+        } 
     }
 
     private IEnumerator ContinuousSpeedIncrease()
@@ -116,16 +110,9 @@ public class Spawner : MonoBehaviour
 
     private static void PostSpawnFixups(GameObject root)
     {
-        ForceChildrenLayersToRoot(root);
+        // Don't modify any layer settings, keep prefab's original layer configuration
         MakeAllCollidersTrigger(root);
         EnsureHasKinematicRB(root);
-    }
-
-    private static void ForceChildrenLayersToRoot(GameObject root)
-    {
-        int layer = root.layer; 
-        foreach (var t in root.GetComponentsInChildren<Transform>(true))
-            t.gameObject.layer = layer;
     }
 
     private static void MakeAllCollidersTrigger(GameObject root)
@@ -136,19 +123,33 @@ public class Spawner : MonoBehaviour
 
     private static void EnsureHasKinematicRB(GameObject root)
     {
-        var rb = root.GetComponentInChildren<Rigidbody2D>();
-        if (!rb) rb = root.AddComponent<Rigidbody2D>();
+        // Handle all Rigidbody2D components to ensure all parts of composite obstacles have correct physics settings
+        var rbs = root.GetComponentsInChildren<Rigidbody2D>();
+        
+        if (rbs.Length == 0)
+        {
+            // If no Rigidbody2D exists, add one to the root object
+            var rb = root.AddComponent<Rigidbody2D>();
+            SetupRigidbody(rb);
+        }
+        else
+        {
+            // Setup all existing Rigidbody2D components
+            foreach (var rb in rbs)
+            {
+                SetupRigidbody(rb);
+            }
+        }
+    }
+    
+    private static void SetupRigidbody(Rigidbody2D rb)
+    {
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
-    private bool IsType1(GameObject prefab)
-    {
-        string n = prefab.name.ToLowerInvariant();
-        return n.Contains("type1") || n.Replace(" ", "").Contains("type1");
-    }
 
     public void RemoveObstacle(GameObject obstacle)
     {
@@ -165,8 +166,12 @@ public class Spawner : MonoBehaviour
         {
             if (obstacle != null)
             {
-                var rb = obstacle.GetComponentInChildren<Rigidbody2D>();
-                if (rb) rb.linearVelocity = Vector2.left * obstacleSpeed;
+                // Set velocity for all Rigidbody2D components in composite obstacles
+                var rbs = obstacle.GetComponentsInChildren<Rigidbody2D>();
+                foreach (var rb in rbs)
+                {
+                    if (rb) rb.linearVelocity = Vector2.left * obstacleSpeed;
+                }
             }
         }
     }

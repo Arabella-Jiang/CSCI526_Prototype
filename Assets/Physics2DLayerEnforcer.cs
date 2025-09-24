@@ -9,11 +9,12 @@ public class Physics2DLayerEnforcer : MonoBehaviour
         int OL = LayerMask.NameToLayer("Obstacle-light");
         int OS = LayerMask.NameToLayer("Obstacle-shadow");
 
-        if (PL==-1||PS==-1||OL==-1||OS==-1) { Debug.LogError("[LayerEnforcer] 层名不全"); return; }
+        if (PL==-1||PS==-1||OL==-1||OS==-1) { Debug.LogError("[LayerEnforcer] Missing layer names"); return; }
 
-        Physics2D.IgnoreLayerCollision(PS, OL, true); 
-        Physics2D.IgnoreLayerCollision(PL, OS, true);
+        // Reversed logic: same color passes through, different color collides
+        Physics2D.IgnoreLayerCollision(PS, OS, true);  // Player-shadow passes through Obstacle-shadow
+        Physics2D.IgnoreLayerCollision(PL, OL, true);  // Player-light passes through Obstacle-light
 
-        Debug.Log($"[LayerEnforcer] ignore(PS,OL)={Physics2D.GetIgnoreLayerCollision(PS,OL)}  ignore(PL,OS)={Physics2D.GetIgnoreLayerCollision(PL,OS)}");
+        Debug.Log($"[LayerEnforcer] ignore(PS,OS)={Physics2D.GetIgnoreLayerCollision(PS,OS)}  ignore(PL,OL)={Physics2D.GetIgnoreLayerCollision(PL,OL)}");
     }
 }

@@ -809,6 +809,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94ca8830cb0d247edb55ada10f9b1f43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  tutorialObSequence:
+  - {fileID: 2317311499053294393, guid: 04099c4ef451d408abaa562ec900f1c7, type: 3}
+  - {fileID: 2299615551346551750, guid: 93525cf0513334fe9a02f3712a2c9332, type: 3}
+  - {fileID: 5150673907284124203, guid: ec28086f58ac447bdadc92149854c73f, type: 3}
+  - {fileID: 5068143965431816261, guid: 78bdc8be233a34bc7bfd16da6c50a40f, type: 3}
+  - {fileID: 2299615551346551750, guid: 629b89ee4c3e944479cbd6e59a5621d4, type: 3}
+  - {fileID: 5068143965431816261, guid: 9ab3070287034437e8017686f6dbab8e, type: 3}
+  - {fileID: 5150673907284124203, guid: 6bf33579dad6746929a000a5a4f89f64, type: 3}
+  enableTutorial: 1
+  tutorialcompletionDelay: 5
   obstaclePrefabs:
   - {fileID: 2317311499053294393, guid: 04099c4ef451d408abaa562ec900f1c7, type: 3}
   - {fileID: 4913700686604917134, guid: 4e2ea424c45f54c53b9039c1229fe312, type: 3}
@@ -833,7 +843,7 @@ Transform:
   m_GameObject: {fileID: 1966930285}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.93, y: -4, z: 0}
+  m_LocalPosition: {x: 24.22, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

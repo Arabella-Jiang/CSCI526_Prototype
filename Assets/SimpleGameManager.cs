@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class SimpleGameManager : MonoBehaviour
@@ -56,6 +57,13 @@ public class SimpleGameManager : MonoBehaviour
     
     private void CreateUI()
     {
+        if (FindFirstObjectByType<EventSystem>() == null)
+        {
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<EventSystem>();
+            eventSystemObj.AddComponent<StandaloneInputModule>();
+        }
+        
         Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
@@ -77,7 +85,7 @@ public class SimpleGameManager : MonoBehaviour
         scoreObj.transform.SetParent(canvas.transform);
         
         scoreText = scoreObj.AddComponent<TextMeshProUGUI>();
-        scoreText.text = "Score: 0";
+        scoreText.text = "Time: 0:00";
         scoreText.fontSize = 24;
         scoreText.color = Color.white;
         scoreText.alignment = TextAlignmentOptions.TopLeft;
@@ -201,7 +209,7 @@ public class SimpleGameManager : MonoBehaviour
         scoreObj.transform.SetParent(gameOverScreen.transform);
         
         TextMeshProUGUI finalScoreText = scoreObj.AddComponent<TextMeshProUGUI>();
-        finalScoreText.text = "Final Score: 0";
+        finalScoreText.text = "Final Time: 0:00";
         finalScoreText.fontSize = 24;
         finalScoreText.color = Color.white;
         finalScoreText.alignment = TextAlignmentOptions.Center;
@@ -211,6 +219,40 @@ public class SimpleGameManager : MonoBehaviour
         scoreRect.anchorMax = new Vector2(0.5f, 0.4f);
         scoreRect.anchoredPosition = Vector2.zero;
         scoreRect.sizeDelta = new Vector2(400, 50);
+        
+        // Create Restart Button
+        GameObject restartButtonObj = new GameObject("RestartButton");
+        restartButtonObj.transform.SetParent(gameOverScreen.transform);
+        
+        Button restartButton = restartButtonObj.AddComponent<Button>();
+        Image buttonImage = restartButtonObj.AddComponent<Image>();
+        buttonImage.color = new Color(0.2f, 0.6f, 0.2f, 0.8f); // Green background
+        
+        RectTransform buttonRect = restartButtonObj.GetComponent<RectTransform>();
+        buttonRect.anchorMin = new Vector2(0.5f, 0.25f);
+        buttonRect.anchorMax = new Vector2(0.5f, 0.25f);
+        buttonRect.anchoredPosition = Vector2.zero;
+        buttonRect.sizeDelta = new Vector2(200, 50);
+        
+        // Button Text
+        GameObject buttonTextObj = new GameObject("RestartButtonText");
+        buttonTextObj.transform.SetParent(restartButtonObj.transform);
+        
+        TextMeshProUGUI buttonText = buttonTextObj.AddComponent<TextMeshProUGUI>();
+        buttonText.text = "RESTART";
+        buttonText.fontSize = 20;
+        buttonText.color = Color.white;
+        buttonText.alignment = TextAlignmentOptions.Center;
+        buttonText.fontStyle = FontStyles.Bold;
+        
+        RectTransform buttonTextRect = buttonTextObj.GetComponent<RectTransform>();
+        buttonTextRect.anchorMin = Vector2.zero;
+        buttonTextRect.anchorMax = Vector2.one;
+        buttonTextRect.offsetMin = Vector2.zero;
+        buttonTextRect.offsetMax = Vector2.zero;
+        
+        // Add button click event
+        restartButton.onClick.AddListener(RestartGame);
         
         gameOverScreen.SetActive(false);
     }
@@ -249,9 +291,9 @@ public class SimpleGameManager : MonoBehaviour
             TextMeshProUGUI[] allTexts = gameOverScreen.GetComponentsInChildren<TextMeshProUGUI>();
             foreach (TextMeshProUGUI text in allTexts)
             {
-                if (text.text.Contains("Final Score"))
+                if (text.text.Contains("Final Time"))
                 {
-                    text.text = $"Final Score: {Mathf.FloorToInt(survivalTime)}";
+                    text.text = $"Final Time: {FormatTime(survivalTime)}";
                     break;
                 }
             }
@@ -262,8 +304,15 @@ public class SimpleGameManager : MonoBehaviour
     {
         if (scoreText != null)
         {
-            scoreText.text = $"Score: {Mathf.FloorToInt(survivalTime)}";
+            scoreText.text = $"Time: {FormatTime(survivalTime)}";
         }
+    }
+    
+    private string FormatTime(float timeInSeconds)
+    {
+        int minutes = Mathf.FloorToInt(timeInSeconds / 60f);
+        int seconds = Mathf.FloorToInt(timeInSeconds % 60f);
+        return $"{minutes}:{seconds:00}";
     }
     
     public float GetSurvivalTime()
@@ -274,5 +323,109 @@ public class SimpleGameManager : MonoBehaviour
     public int GetScore()
     {
         return Mathf.FloorToInt(survivalTime);
+    }
+    
+    public void RestartGame()
+    {
+        Debug.Log("RestartGame() called - button clicked!");
+        
+        // Reset game state
+        isGameOver = false;
+        isGamePaused = false;
+        survivalTime = 0f;
+        gameStarted = true;
+        
+        // Reset time scale
+        Time.timeScale = 1f;
+        Debug.Log("Time scale reset to 1");
+        
+        // Hide game over screen
+        if (gameOverScreen != null)
+        {
+            gameOverScreen.SetActive(false);
+            Debug.Log("Game over screen hidden");
+        }
+        
+        // Clear all active obstacles
+        Spawner spawner = FindFirstObjectByType<Spawner>();
+        if (spawner != null)
+        {
+            spawner.ClearAllObstacles();
+            spawner.ResetSpeed();
+            Debug.Log("Obstacles cleared and speed reset");
+            
+            // Restart tutorial if enabled
+            if (spawner.enableTutorial)
+            {
+                spawner.RestartTutorial();
+                Debug.Log("Tutorial restarted");
+            }
+        }
+        else
+        {
+            Debug.LogError("Spawner not found!");
+        }
+        
+        // Reset player position and state
+        PlayerMovement playerMovement = FindFirstObjectByType<PlayerMovement>();
+        if (playerMovement == null)
+        {
+            // Try to find inactive player
+            GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            foreach (GameObject obj in allObjects)
+            {
+                if (obj.name == "Player" && obj.GetComponent<PlayerMovement>() != null)
+                {
+                    playerMovement = obj.GetComponent<PlayerMovement>();
+                    break;
+                }
+            }
+        }
+        
+        if (playerMovement != null)
+        {
+            // Reactivate player if it was deactivated
+            if (!playerMovement.gameObject.activeInHierarchy)
+            {
+                playerMovement.gameObject.SetActive(true);
+                Debug.Log("Player reactivated");
+            }
+            
+            // Reset player to starting position
+            playerMovement.transform.position = new Vector3(-7f, -4f, 0f);
+            Debug.Log("Player position reset");
+            
+            // Reset player velocity
+            Rigidbody2D playerRb = playerMovement.GetComponent<Rigidbody2D>();
+            if (playerRb != null)
+            {
+                playerRb.linearVelocity = Vector2.zero;
+                Debug.Log("Player velocity reset");
+            }
+        }
+        else
+        {
+            Debug.LogError("PlayerMovement not found!");
+        }
+        
+        // Reset player form to light
+        PlayerFormSwitcher formSwitcher = FindFirstObjectByType<PlayerFormSwitcher>();
+        if (formSwitcher == null && playerMovement != null)
+        {
+            // Try to get it from the same player object
+            formSwitcher = playerMovement.GetComponent<PlayerFormSwitcher>();
+        }
+        
+        if (formSwitcher != null)
+        {
+            formSwitcher.SetForm(PlayerFormSwitcher.Form.Light);
+            Debug.Log("Player form reset to Light");
+        }
+        else
+        {
+            Debug.LogError("PlayerFormSwitcher not found!");
+        }
+        
+        Debug.Log("Game restart completed successfully!");
     }
 }

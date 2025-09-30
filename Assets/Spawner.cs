@@ -12,7 +12,8 @@ public class Spawner : MonoBehaviour
     private bool isTutorialMode = true;
     private int currentTutorialStep = 0;
     private bool tutorialCompleted = false;
-    private float tutorialObSpawnTime = 5f;
+    private float tutorialObSpawnTime = 4f;
+    private bool isFirstSpawn = true;
 
     [SerializeField] private GameObject[] obstaclePrefabs;
 
@@ -36,6 +37,7 @@ public class Spawner : MonoBehaviour
     private void Start()
     {
         initialObstacleSpeed = obstacleSpeed;
+        timeUntilObstacleSpawn = 2f;
 
         //update: whether active tutorial mode
         if (enableTutorial && tutorialObSequence != null && tutorialObSequence.Length > 0)
@@ -58,6 +60,7 @@ public class Spawner : MonoBehaviour
         currentTutorialStep = 0;
         tutorialCompleted = false;
         obstacleSpeed = initialObstacleSpeed;
+        isFirstSpawn = true;
         Debug.Log("Tutorial mode started");
         OnTutorialStepStarted?.Invoke(currentTutorialStep);
     }
@@ -77,12 +80,22 @@ public class Spawner : MonoBehaviour
         timeUntilObstacleSpawn += Time.deltaTime;
 
         //adjust spawn time based on tutorial / normal game mode
-        float currentSpawnTime = isTutorialMode ? tutorialObSpawnTime : obstacleSpawnTime;
+        float currentSpawnTime;
+        if (isFirstSpawn)
+        {
+            // First spawn happens after 2 seconds regardless of mode
+            currentSpawnTime = 2f;
+        }
+        else
+        {
+            currentSpawnTime = isTutorialMode ? tutorialObSpawnTime : obstacleSpawnTime;
+        }
 
         if (timeUntilObstacleSpawn >= currentSpawnTime && CanSpawnSafely())
         {
             Spawn();
             timeUntilObstacleSpawn = 0f;
+            isFirstSpawn = false;
         }
 
         //Check whether obstacle ob get out of the screen
@@ -274,6 +287,27 @@ public class Spawner : MonoBehaviour
             newSequence[i - 1] = tutorialObSequence[i];
         }
         tutorialObSequence = newSequence;
+    }
+
+    public void ClearAllObstacles()
+    {
+        // Destroy all active obstacles
+        for (int i = activeObstacles.Count - 1; i >= 0; i--)
+        {
+            if (activeObstacles[i] != null)
+            {
+                Destroy(activeObstacles[i]);
+            }
+        }
+        activeObstacles.Clear();
+        
+        // Reset spawn timer to 2 seconds for faster initial spawn
+        timeUntilObstacleSpawn = 2f;
+        lastSpawnTime = 0f;
+        lastSpawnedOb = null;
+        isFirstSpawn = true; // Reset first spawn flag
+        
+        Debug.Log("All obstacles cleared");
     }
 
     

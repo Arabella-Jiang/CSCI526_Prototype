@@ -1,0 +1,13 @@
+{
+    "targets": {
+        "webgl-demo": {
+            "platform": "webgl",
+            "buildMethod": "BuildScript.BuildWebGLNoCompression",
+            "options": {
+                "compressionFormat": "Disabled",
+                "decompressionFallback": true,
+                "linkerTarget": "Wasm"
+            }
+        }
+    }
+}

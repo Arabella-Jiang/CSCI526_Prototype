@@ -19,7 +19,7 @@ public class PlayerCollision : MonoBehaviour
         int me = gameObject.layer, ot = other.gameObject.layer;
         if ((me == L_PL && ot == L_OS) || (me == L_PS && ot == L_OL))
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             if (SimpleGameManager.Instance != null)
                 SimpleGameManager.Instance.GameOver();
         }

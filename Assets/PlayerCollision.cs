@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     int L_PL, L_PS, L_OL, L_OS;
-    int score = 0;
 
     void Awake()
     {
@@ -18,11 +17,11 @@ public class PlayerCollision : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         int me = gameObject.layer, ot = other.gameObject.layer;
-        // Reversed logic: different colors cause death
         if ((me == L_PL && ot == L_OS) || (me == L_PS && ot == L_OL))
         {
-            Destroy(gameObject); //Destroy obstacle
-            // TODO: GM/HP
+            Destroy(gameObject);
+            if (SimpleGameManager.Instance != null)
+                SimpleGameManager.Instance.GameOver();
         }
     }
 
@@ -36,7 +35,6 @@ public class PlayerCollision : MonoBehaviour
             (me == L_PL && ot == L_OL) ||   
             (me == L_PS && ot == L_OS);    
 
-        // Reversed logic: same colors pass through
         if (isObstacle && isMatchedPair)
         {
             foreach (var myCol in GetComponentsInChildren<Collider2D>())

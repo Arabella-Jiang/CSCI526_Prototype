@@ -222,6 +222,60 @@ public class Spawner : MonoBehaviour
         return (currentTutorialStep, tutorialObSequence.Length);
     }
 
+    // Methods to dynamically adjust tutorial sequence
+    public void SetTutorialSequence(GameObject[] newSequence)
+    {
+        tutorialObSequence = newSequence;
+        if (isTutorialMode && currentTutorialStep >= tutorialObSequence.Length)
+        {
+            StartCoroutine(CompleteTutorial());
+        }
+    }
+
+    public void AddToTutorialSequence(GameObject prefab)
+    {
+        var newSequence = new GameObject[tutorialObSequence.Length + 1];
+        for (int i = 0; i < tutorialObSequence.Length; i++)
+        {
+            newSequence[i] = tutorialObSequence[i];
+        }
+        newSequence[tutorialObSequence.Length] = prefab;
+        tutorialObSequence = newSequence;
+    }
+
+    public void InsertInTutorialSequence(int index, GameObject prefab)
+    {
+        if (index < 0 || index > tutorialObSequence.Length) return;
+        
+        var newSequence = new GameObject[tutorialObSequence.Length + 1];
+        for (int i = 0; i < index; i++)
+        {
+            newSequence[i] = tutorialObSequence[i];
+        }
+        newSequence[index] = prefab;
+        for (int i = index; i < tutorialObSequence.Length; i++)
+        {
+            newSequence[i + 1] = tutorialObSequence[i];
+        }
+        tutorialObSequence = newSequence;
+    }
+
+    public void RemoveFromTutorialSequence(int index)
+    {
+        if (index < 0 || index >= tutorialObSequence.Length) return;
+        
+        var newSequence = new GameObject[tutorialObSequence.Length - 1];
+        for (int i = 0; i < index; i++)
+        {
+            newSequence[i] = tutorialObSequence[i];
+        }
+        for (int i = index + 1; i < tutorialObSequence.Length; i++)
+        {
+            newSequence[i - 1] = tutorialObSequence[i];
+        }
+        tutorialObSequence = newSequence;
+    }
+
     
     private IEnumerator ContinuousSpeedIncrease()
     {
